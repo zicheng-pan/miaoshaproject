@@ -8,6 +8,8 @@ import com.example.miaoshaproject.error.BusinessException;
 import com.example.miaoshaproject.error.EmBusinessError;
 import com.example.miaoshaproject.service.UserService;
 import com.example.miaoshaproject.service.model.UserModel;
+import com.example.miaoshaproject.validator.ValidationResult;
+import com.example.miaoshaproject.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserPasswordDOMapper userPasswordDOMapper;
+
+    @Autowired
+    private ValidatorImpl validator;
 
     @Override
     public UserModel getUserById(Integer id) {
@@ -41,12 +46,16 @@ public class UserServiceImpl implements UserService {
         if (userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        if (StringUtils.isEmpty(userModel.getName()) ||
-                userModel.getAge() == null ||
-                StringUtils.isEmpty(userModel.getEncrptPassword()) ||
-                userModel.getAge() == null
-        ) {
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+//        if (StringUtils.isEmpty(userModel.getName()) ||
+//                userModel.getAge() == null ||
+//                StringUtils.isEmpty(userModel.getEncrptPassword()) ||
+//                userModel.getAge() == null
+//        ) {
+
+        // 通过这种简单的方式，就可以在我们想要校验的model类上添加相应的注解就可以了
+        ValidationResult validationResult = validator.validate(userModel);
+        if (validationResult.isHasErrors()) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, validationResult.getErrMsg());
         }
 
         // 将UserModel 转成UserDO
@@ -64,6 +73,24 @@ public class UserServiceImpl implements UserService {
         UserPasswordDO userPasswordDO = convertUserPasswordDOFromUserModel(userModel);
         userPasswordDOMapper.insertSelective(userPasswordDO);
 
+    }
+
+    @Override
+    public UserModel validateLogin(String telephone, String password) throws BusinessException {
+        // 通过用户手机获取用户信息
+        UserDO userDO = userDOMapper.selectByTelephone(telephone);
+        // 校验用户输入密码和加密密码是否一致
+        if (userDO == null) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+        String userPassword = userPasswordDO.getEncrptPassword();
+
+        if (!StringUtils.equals(password, userPassword)) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+
+        return convertFromDataObject(userDO, userPasswordDO);// 用户登录成功
     }
 
     private UserPasswordDO convertUserPasswordDOFromUserModel(UserModel userModel) {

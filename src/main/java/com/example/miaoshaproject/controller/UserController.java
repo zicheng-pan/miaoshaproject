@@ -43,6 +43,19 @@ public class UserController extends BaseController {
         return CommonRetureType.create(userVO);
     }
 
+    @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonRetureType login(@RequestParam(name = "telephone") String telephone,
+                                  @RequestParam(name = "password") String password) throws Exception {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(telephone) && org.apache.commons.lang3.StringUtils.isEmpty(password))
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "用户名密码不能为空");
+        UserModel userModel = userService.validateLogin(telephone, this.EncodeByMd5(password));
+
+        httpServletRequest.getSession().setAttribute("IS_LOGIN", true); // 单点设置登录成功
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER", userModel);
+        return CommonRetureType.create("用户登录成功");
+    }
+
     //解析post里面的 form表单里面的请求数据 同样通过@RequestParam的参数
     @RequestMapping(value = "/getotp", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
