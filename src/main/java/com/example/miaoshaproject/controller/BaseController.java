@@ -14,12 +14,15 @@ import java.util.Map;
 
 public class BaseController {
 
+    public static final String CONTENT_TYPE_FORMED = "application/x-www-form-urlencoded";
+
     // 处理所有的 Controller 中没有解决的 Exception 在tomcat 容器中，将返回结果都包装成自己的errorMessage
     // 对于这种方案 ExceptionHanlder 方法返回的Object 只能找一些返回值对应的资源文件，处理不像@ResponseBody一样，将字符串返回
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Object HandlerException(HttpServletRequest request, Exception exception) {
+        exception.printStackTrace();
         Map<String, Object> responseData = new HashMap<>();
         if (exception instanceof BusinessException) {
             BusinessException businessException = (BusinessException) exception;
