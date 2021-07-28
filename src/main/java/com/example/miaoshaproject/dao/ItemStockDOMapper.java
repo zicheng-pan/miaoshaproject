@@ -1,6 +1,9 @@
 package com.example.miaoshaproject.dao;
 
+import com.example.miaoshaproject.dataobject.ItemDO;
 import com.example.miaoshaproject.dataobject.ItemStockDO;
+
+import java.util.List;
 
 public interface ItemStockDOMapper {
     /**
@@ -50,4 +53,7 @@ public interface ItemStockDOMapper {
      * @mbg.generated Wed Jul 28 00:09:54 CST 2021
      */
     int updateByPrimaryKey(ItemStockDO record);
+
+    ItemStockDO selectByItemId(Integer itemId);
+
 }

@@ -94,7 +94,7 @@ var g_itemVO = {};
 					"amount":1,
 					"promoId":g_itemVO.promoId
 				},
-				xhrFields:{withCredentials:true},
+				// xhrFields:{withCredentials:true},
 				success:function(data){
 					if(data.status == "success"){
 						alert("下单成功");
@@ -120,7 +120,7 @@ var g_itemVO = {};
 				data:{
 					"id":getParam("id"),
 				},
-				xhrFields:{withCredentials:true},
+				// xhrFields:{withCredentials:true},
 				success:function(data){
 					if(data.status == "success"){
 						g_itemVO = data.data;
