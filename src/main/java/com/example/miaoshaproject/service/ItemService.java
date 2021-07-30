@@ -19,4 +19,7 @@ public interface ItemService {
     // 减库存
     boolean decreaseStock(Integer itemId, Integer amount);
 
+    // 商品销量增加
+    void increaseSales(Integer itemId, Integer amount);
+
 }

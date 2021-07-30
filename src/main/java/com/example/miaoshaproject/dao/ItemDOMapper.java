@@ -55,4 +55,6 @@ public interface ItemDOMapper {
 
 
     List<ItemDO> listItem();
+
+    void increaseSales(Integer id, Integer amount);
 }
