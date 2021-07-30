@@ -28,14 +28,16 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/createorder", method = {RequestMethod.POST}, consumes = CONTENT_TYPE_FORMED)
     @ResponseBody
     public CommonRetureType createOrder(@RequestParam(name = "itemId") Integer itemId,
-                                        @RequestParam(name = "amount") Integer amount) throws BusinessException {
+                                        @RequestParam(name = "amount") Integer amount,
+                                        @RequestParam(name = "promoId") Integer promoId
+    ) throws BusinessException {
 
         Boolean isLogin = (Boolean) httpServletRequest.getSession().getAttribute("IS_LOGIN");
         if (isLogin == null || !isLogin) {
             throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户未登录, 不能下单");
         }
         UserModel userModel = (UserModel) httpServletRequest.getSession().getAttribute("LOGIN_USER");
-        OrderModel order = orderService.createOrder(userModel.getId(), itemId, amount);
+        OrderModel order = orderService.createOrder(userModel.getId(), itemId, amount, promoId);
         return CommonRetureType.create(order);
     }
 

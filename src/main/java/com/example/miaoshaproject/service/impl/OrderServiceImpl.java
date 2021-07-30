@@ -8,9 +8,11 @@ import com.example.miaoshaproject.error.BusinessException;
 import com.example.miaoshaproject.error.EmBusinessError;
 import com.example.miaoshaproject.service.ItemService;
 import com.example.miaoshaproject.service.OrderService;
+import com.example.miaoshaproject.service.PromoService;
 import com.example.miaoshaproject.service.UserService;
 import com.example.miaoshaproject.service.model.ItemModel;
 import com.example.miaoshaproject.service.model.OrderModel;
+import com.example.miaoshaproject.service.model.PromoModel;
 import com.example.miaoshaproject.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +39,12 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SequenceDOMapper sequenceDOMapper;
 
+    @Autowired
+    private PromoService promoService;
+
     @Transactional
     @Override
-    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount, Integer promoId) throws BusinessException {
 
         // 首先需要校验状态
         // 1. 校验下单状态，下单商品是否存在， 用户是否合法，购买数量是否正确
@@ -66,9 +71,22 @@ public class OrderServiceImpl implements OrderService {
         OrderModel orderModel = new OrderModel();
         orderModel.setAmount(amount);
         orderModel.setItemId(itemId);
-        orderModel.setItemPrice(itemModel.getPrice());
-        orderModel.setUserId(userId);
+        if (promoId != null) {
+            PromoModel promoModel = promoService.getPromoById(itemId);
+            if (promoId != itemModel.getPromoModel().getId()) {
+                // 校验对应活动是否存在这个使用商品
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动信息不正确");
+            } else if (itemModel.getPromoModel().getStatus() != 2) {
+                // 校验活动是否正在进行
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动还未开始");
 
+            }
+            orderModel.setItemPrice(promoModel.getPromoItemPrice());
+        } else {
+            orderModel.setItemPrice(itemModel.getPrice());
+        }
+        orderModel.setUserId(userId);
+        orderModel.setPromoId(promoId);
         orderModel.setId(generateOrderID());
         OrderDO orderDO = convertFromOrderModel(orderModel);
         orderDOMapper.insert(orderDO);
@@ -133,4 +151,5 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orderModel, orderDO);
         return orderDO;
     }
+
 }

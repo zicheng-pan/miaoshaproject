@@ -12,6 +12,8 @@ public class OrderModel {
     private BigDecimal orderPrice;
     // 订单单价
     private BigDecimal itemPrice;
+    // 如果promoId 存在，那么就以秒杀价格下单
+    private Integer promoId;
 
     public String getId() {
         return id;
@@ -59,5 +61,13 @@ public class OrderModel {
 
     public void setItemPrice(BigDecimal itemPrice) {
         this.itemPrice = itemPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
     }
 }

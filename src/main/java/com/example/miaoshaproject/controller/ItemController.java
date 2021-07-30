@@ -5,6 +5,8 @@ import com.example.miaoshaproject.error.BusinessException;
 import com.example.miaoshaproject.response.CommonRetureType;
 import com.example.miaoshaproject.service.ItemService;
 import com.example.miaoshaproject.service.model.ItemModel;
+import com.example.miaoshaproject.service.model.PromoModel;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Controller("item")
 
-@CrossOrigin(allowCredentials="true",allowedHeaders="*")
+@CrossOrigin(allowCredentials = "true", allowedHeaders = "*")
 @RequestMapping("/item")
 public class ItemController extends BaseController {
 
@@ -47,6 +49,16 @@ public class ItemController extends BaseController {
     private ItemVO convertFromItemModel(ItemModel result) {
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(result, itemVO);
+        PromoModel promoModel = result.getPromoModel();
+        if (promoModel != null) {
+            itemVO.setPromoStatus(promoModel.getStatus());
+            itemVO.setPromoPrice(promoModel.getPromoItemPrice());
+            itemVO.setPromoId(promoModel.getId());
+            itemVO.setPromoStartDate(promoModel.getStartDate().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+        } else {
+            // 表示没有秒杀活动
+            itemVO.setPromoStatus(0);
+        }
         return itemVO;
     }
 

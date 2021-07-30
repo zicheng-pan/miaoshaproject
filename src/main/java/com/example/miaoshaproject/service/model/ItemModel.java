@@ -9,6 +9,9 @@ public class ItemModel {
 
     private Integer id;
 
+    // 如果秒杀不为空，则表示当前商品还拥有没有结束的秒杀活动  --》两种，一个是未开始，一个是正在进行
+    private PromoModel promoModel;
+
     // 商品名称
     @NotBlank(message = "商品名称不能为空")
     private String title;
@@ -87,5 +90,13 @@ public class ItemModel {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public PromoModel getPromoModel() {
+        return promoModel;
+    }
+
+    public void setPromoModel(PromoModel promoModel) {
+        this.promoModel = promoModel;
     }
 }
