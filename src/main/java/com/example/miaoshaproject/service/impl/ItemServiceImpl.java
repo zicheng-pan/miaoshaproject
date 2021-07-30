@@ -94,6 +94,31 @@ public class ItemServiceImpl implements ItemService {
         return itemModel;
     }
 
+    @Override
+    @Transactional
+    public boolean decreaseStock(Integer itemId, Integer amount) {
+        int affectedRow = itemStockDOMapper.decreaseStock(itemId, amount);
+        // 如果 库存数少于要购买的数量，所以失败   返回影响条目数
+        // 一般也可以使用 先查一遍库存，select for update 上锁，查询，然后计算库存，再update数据库，
+        /*
+        begin;
+
+        select * from goods where id = 1 for update;
+
+        update goods set stock = stock - 1 where id = 1;
+
+        commit;
+         */
+        // 这里采用update语句中判断库存数量的方式，这种方式直接update 也是原子操作，性能会好一些，少了查表，java内存计算的步骤
+        if (affectedRow >= 1) {
+            // 成功
+            return true;
+        } else {
+            // 失败
+            return false;
+        }
+    }
+
     private ItemModel converFromDO(ItemDO itemDO, ItemStockDO itemStockDO) {
         ItemModel itemModel = new ItemModel();
         BeanUtils.copyProperties(itemDO, itemModel);

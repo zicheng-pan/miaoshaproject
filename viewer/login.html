@@ -67,7 +67,7 @@
                     "telephone": $("#telephone").val(),
                     "password": password
                 },
-                // xhrFields:{withCredentials:true},
+                xhrFields:{withCredentials:true},
                 success: function (data) {
                     if (data.status == "success") {
                         alert("登陆成功");

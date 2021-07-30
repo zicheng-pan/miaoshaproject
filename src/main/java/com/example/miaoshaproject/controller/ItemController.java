@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller("item")
-@CrossOrigin
+
+@CrossOrigin(allowCredentials="true",allowedHeaders="*")
 @RequestMapping("/item")
 public class ItemController extends BaseController {
 
